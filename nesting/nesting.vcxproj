@@ -104,10 +104,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>..\..\Dependencies\glui\include;..\..\Dependencies\glew-2.1.0\include;..\..\Dependencies\freeglut-3.4.0\include;..\..\Dependencies\CGAL-5.6\include;..\..\Dependencies\boost_1_83_0;..\..\Dependencies\opencv\build\include;%(AdditionalUsingDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\..\Dependencies\glui\build_x64\Debug;..\..\Dependencies\freeglut-3.4.0\build_x64\lib\Debug;..\..\Dependencies\glew-2.1.0\lib\Release\x64;..\..\Dependencies\opencv\build\x64\vc16\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glui_staticd.lib;freeglutd.lib;glew32.lib;opencv_world480d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,7 +132,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoundingBox.cpp" />
+    <ClCompile Include="callbacks.cpp" />
+    <ClCompile Include="display_lists_generation.cpp" />
+    <ClCompile Include="DrawingStatus.cpp" />
+    <ClCompile Include="DrawingWithRotations.cpp" />
+    <ClCompile Include="global.cpp" />
+    <ClCompile Include="Layout.cpp" />
+    <ClCompile Include="LayoutBuilder.cpp" />
+    <ClCompile Include="LayoutLoader.cpp" />
+    <ClCompile Include="measurements.cpp" />
     <ClCompile Include="nesting.cpp" />
+    <ClCompile Include="NonFitPolygonsCalculation.cpp" />
+    <ClCompile Include="Piece.cpp" />
+    <ClCompile Include="Problem.cpp" />
+    <ClCompile Include="SolvingStatus.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BoundingBox.h" />
+    <ClInclude Include="callbacks.h" />
+    <ClInclude Include="display_lists_generation.h" />
+    <ClInclude Include="DrawingStatus.h" />
+    <ClInclude Include="DrawingWithRotations.h" />
+    <ClInclude Include="global.h" />
+    <ClInclude Include="Layout.h" />
+    <ClInclude Include="LayoutBuilder.h" />
+    <ClInclude Include="LayoutLoader.h" />
+    <ClInclude Include="measurements.h" />
+    <ClInclude Include="NonFitPolygonsCalculation.h" />
+    <ClInclude Include="Piece.h" />
+    <ClInclude Include="PolyInfo.h" />
+    <ClInclude Include="print_utils.h" />
+    <ClInclude Include="Problem.h" />
+    <ClInclude Include="SolvingStatus.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
