@@ -9,6 +9,40 @@ int handle;
 
 ofstream testfile;
 
+void solveCB(int dummy)
+{
+
+	//getData
+
+	cout << "Selected nfp algorithm: " << globalUserSelection.nfpsCalculation << endl;
+	cout << "Selected heuristic: " << globalUserSelection.heuristic << endl;
+	cout << "Selected problem name: " << globalUserSelection.problemName << endl;
+
+
+	//loadProblem
+	globalLayout.load("problems/", globalUserSelection.problemName);
+
+	//pre process geometry
+	globalSolvingStatus.load(globalUserSelection, globalLayout);
+
+	globalDrawingStatus.load(globalUserSelection, globalLayout, globalSolvingStatus);
+
+	int resCorrectionWidth = globalDrawingStatus.viewport.getWidth() / globalLayout.getResolution();
+
+	glutReshapeWindow(globalDrawingStatus.w + globalDrawingStatus.tx, globalDrawingStatus.h + globalDrawingStatus.ty);
+	cout << "Viewport: " << globalDrawingStatus.viewport.getWidth() << "    " << globalDrawingStatus.viewport.getHeight() << endl;
+	cout << "Window Dimensions: " << globalDrawingStatus.w << " " << globalDrawingStatus.h << endl;
+	cout << "Resolution: " << globalLayout.getResolution() << endl;
+
+	//inicializar poedeira de peças
+	if (globalUserSelection.heuristic == DYNAMIC)
+		LayoutBuilder::putPieceDynamic(globalLayout, globalSolvingStatus, globalDrawingStatus, true);
+
+
+}
+
+
+
 void displayCB()
 {
 	// clear buffer
@@ -95,41 +129,6 @@ void reshapeCB(int w, int h)
 	GLUI_Master.auto_set_viewport();
 	glutPostRedisplay();
 }
-
-void solveCB(int dummy)
-{
-	
-	//getData
-
-	cout << "Selected nfp algorithm: " << globalUserSelection.nfpsCalculation << endl;
-	cout << "Selected heuristic: " << globalUserSelection.heuristic << endl;
-	cout << "Selected problem name: " << globalUserSelection.problemName << endl;
-
-	
-	//loadProblem
-	LayoutLoader layoutLoader("problems/");
-	globalLayout = layoutLoader.loadLayout(globalUserSelection.problemName);
-
-	//pre process geometry
-	globalSolvingStatus.load(globalUserSelection, globalLayout);
-
-	globalDrawingStatus.load(globalUserSelection, globalLayout, globalSolvingStatus);
-		
-	int resCorrectionWidth = globalDrawingStatus.viewport.getWidth() / globalLayout.getResolution();
-
-	glutReshapeWindow(globalDrawingStatus.w + globalDrawingStatus.tx, globalDrawingStatus.h + globalDrawingStatus.ty);
-	cout << "Viewport: " << globalDrawingStatus.viewport.getWidth() << "    " << globalDrawingStatus.viewport.getHeight() << endl;
-	cout << "Window Dimensions: " << globalDrawingStatus.w << " " << globalDrawingStatus.h << endl;
-	cout << "Resolution: " << globalLayout.getResolution() << endl;
-
-	//inicializar poedeira de peças
-	if (globalUserSelection.heuristic == DYNAMIC)
-		LayoutBuilder::putPieceDynamic(globalLayout, globalSolvingStatus, globalDrawingStatus, true);
-
-
-}
-
-
 
 int initGLUT(int argc, char** argv)
 {

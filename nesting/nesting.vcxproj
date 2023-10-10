@@ -140,7 +140,6 @@
     <ClCompile Include="global.cpp" />
     <ClCompile Include="Layout.cpp" />
     <ClCompile Include="LayoutBuilder.cpp" />
-    <ClCompile Include="LayoutLoader.cpp" />
     <ClCompile Include="measurements.cpp" />
     <ClCompile Include="nesting.cpp" />
     <ClCompile Include="NonFitPolygonsCalculation.cpp" />
@@ -157,7 +156,6 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="Layout.h" />
     <ClInclude Include="LayoutBuilder.h" />
-    <ClInclude Include="LayoutLoader.h" />
     <ClInclude Include="measurements.h" />
     <ClInclude Include="NonFitPolygonsCalculation.h" />
     <ClInclude Include="Piece.h" />

@@ -1,17 +1,24 @@
 #pragma once
+#include <fstream>
 #include "Problem.h"
+
 
 #define myMax(x,y) (x)>(y)?(x):(y)
 #define myMin(x,y) (x)<(y)?(x):(y)
 
 class Layout : public Problem
 {
+private:
 	//Piece stockSheet;
 	vector<Piece> stockSheet;
 	int rotationStep, margin;
 	double resolution;
 	vector<GLfloat*> positions;
 	vector<int> order;
+
+	Problem loadFile(const char* baseFolder, char* filename, bool mode);
+	vector<string> loadConfigurationFile(const char* baseFolder, char* filename);
+	void getFirstNonEmptyLine(istream* s, string* line);
 
 public:
 	Layout();
@@ -35,5 +42,7 @@ public:
 	double getMaxWidth();
 	double getMaxHeight();
 	BoundingBox stockSheetsBoundingBox();
+
+	void load(const char* folder, char* problemName);
 };
 
