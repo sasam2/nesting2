@@ -3,7 +3,6 @@
 #include <GL/glut.h>
 #include <GL/glui.h>
 #include <iostream>
-#include "LayoutLoader.h"
 #include "NonFitPolygonsCalculation.h"
 #include "LayoutBuilder.h"
 

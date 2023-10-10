@@ -13,10 +13,13 @@ void solveCB(int dummy)
 {
 
 	//getData
-
 	cout << "Selected nfp algorithm: " << globalUserSelection.nfpsCalculation << endl;
 	cout << "Selected heuristic: " << globalUserSelection.heuristic << endl;
 	cout << "Selected problem name: " << globalUserSelection.problemName << endl;
+
+
+	//delete data from previous problem
+	globalDrawingStatus.cleanup();
 
 
 	//loadProblem

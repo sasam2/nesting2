@@ -18,6 +18,8 @@ public:
 	DrawingWithRotations currentDrawingPolys;
 	map<Point_2, DrawingWithRotations> currentDrawingNFPs;
 	GLfloat *blue;
+	GLfloat* colorStatic;
+	GLdouble* origin;
 	list<Point_2> piecesOrdered;
 	map<Point_2, DrawingWithRotations> drawingPolysTest;
 	map<Point_2, GLuint> layoutNFPsTest;
@@ -26,9 +28,10 @@ public:
 	int h, w;
 	int tx, ty, tw, th;
 	int stockList;
-
+	
 	DrawingStatus();
 	~DrawingStatus();
 	void load(Selection& userSelection, Layout& layout, SolvingStatus& solvingStatus);
+	void cleanup();
 };
 

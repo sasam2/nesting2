@@ -43,13 +43,11 @@ void DrawingWithRotations::popLastPlacement()
 }
 
 void DrawingWithRotations::resetPlacements() {
-	for (int i = 0; i < order.size(); i++)
+	for (int i = 0; i < positions.size(); i++)
 		delete[] positions[i];
 	positions.clear();
 
-	for (int i = 0; i < order.size(); i++)
-		delete[] colors[i];
-	colors.clear();
+	colors.clear(); //color arrays are deleted in DrawingStatus.cleanup();
 
 	order.clear();
 }
@@ -133,6 +131,11 @@ void DrawingWithRotations::clear()
 {
 	resetPlacements();
 
+	for (int l = 0; l < displayLists.size(); l++) {
+		for (int dl = 0; dl < displayLists[l].size(); dl++) {
+			glDeleteLists(dl, 1);
+		}
+	}
 	displayLists.clear();
 	boundingBoxes.clear();
 

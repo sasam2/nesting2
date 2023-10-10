@@ -35,7 +35,8 @@ void DrawingStatus::load(Selection& userSelection, Layout& layout, SolvingStatus
 	h = hV / layout.getResolution();
 	int wV = viewport.getWidth();
 	w = wV / layout.getResolution();
-	GLdouble* origin = createPosition(0.0, 0.0, 0.0);
+	origin = createPosition(0.0, 0.0, 0.0);
+
 	for (int p = 0; p < numberOfPolygons; p++)
 	{
 		for (int r = 0; r < nrOfRotations; r++)
@@ -80,6 +81,35 @@ void DrawingStatus::load(Selection& userSelection, Layout& layout, SolvingStatus
 		
 }
 
+void DrawingStatus::cleanup() {
+	currentDrawingPolys.clear();
+	//clear currentDrawingNFPs
+	for (map<Point_2, DrawingWithRotations>::iterator it = currentDrawingNFPs.begin(); it != currentDrawingNFPs.end(); it++) {
+		it->second.clear();
+	}
+	currentDrawingNFPs.clear();
+	delete[] blue;
+	delete[] origin;
+	delete[] colorStatic;
+
+	piecesOrdered.clear();
+	//clear drawingPolysTest
+	for (map<Point_2, DrawingWithRotations>::iterator it = drawingPolysTest.begin(); it != drawingPolysTest.end(); it++) {
+		it->second.clear();
+	}
+	//clear layoutNFPsTest
+	for (map<Point_2, GLuint>::iterator it = layoutNFPsTest.begin(); it != layoutNFPsTest.end(); it++) {
+		glDeleteBuffers(1, &it->second);
+	}
+	viewport = BoundingBox();
+	//h = w = tx = ty = tw = th = 0;
+	//clear layoutNFPsTest
+	for (map<Point_2, GLuint>::iterator it = layoutNFPsTest.begin(); it != layoutNFPsTest.end(); it++) {
+		glDeleteBuffers(1, &it->second);
+	}
+	glDeleteLists(stockList, 1);
+	
+}
 
 
 void DrawingStatus::preProcessingStatic(int staticHeuristic, Layout layout, int numberOfPolygons, int nrOfRotations, map<Point_2, PolyInfo> infos)
@@ -243,7 +273,7 @@ void DrawingStatus::preProcessingStatic(int staticHeuristic, Layout layout, int 
 void DrawingStatus::preProcessingDynamic(Layout layout, int numberOfPolygons, int nrOfRotations, int numberOfNFPs, map<Point_2, PolyInfo> infos, vector<Polygon_2>** polygonsDecompositions, vector<Polygon_2>**** nfpsPiecesAndStockSheet)
 {
 	GLdouble* origin = createPosition(0.0, 0.0, 0.0);
-	GLfloat* colorStatic = createColor(0.0, 0.0, 1.0, 1.0);
+	colorStatic = createColor(0.0, 0.0, 1.0, 1.0);
 
 	BoundingBox viewport(layout.stockSheetsBoundingBox().getX(),
 		layout.stockSheetsBoundingBox().getY(),
