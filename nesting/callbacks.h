@@ -6,7 +6,7 @@
 #include "NonFitPolygonsCalculation.h"
 #include "LayoutBuilder.h"
 
-//#define DEBUG
+#define DEBUG
 
 using namespace std;
 

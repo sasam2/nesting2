@@ -272,7 +272,7 @@ void DrawingStatus::preProcessingStatic(int staticHeuristic, Layout layout, int 
 
 void DrawingStatus::preProcessingDynamic(Layout layout, int numberOfPolygons, int nrOfRotations, int numberOfNFPs, map<Point_2, PolyInfo> infos, vector<Polygon_2>** polygonsDecompositions, vector<Polygon_2>**** nfpsPiecesAndStockSheet)
 {
-	GLdouble* origin = createPosition(0.0, 0.0, 0.0);
+	//GLdouble* origin = createPosition(0.0, 0.0, 0.0); //class field
 	colorStatic = createColor(0.0, 0.0, 1.0, 1.0);
 
 	BoundingBox viewport(layout.stockSheetsBoundingBox().getX(),

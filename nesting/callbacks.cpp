@@ -11,16 +11,16 @@ ofstream testfile;
 
 void solveCB(int dummy)
 {
+	//delete data from previous problem
+	globalDrawingStatus.cleanup();
+	globalSolvingStatus.cleanup();
+	//FIXME add layout cleanup here
+	LayoutBuilder::iteration = 0;
 
 	//getData
 	cout << "Selected nfp algorithm: " << globalUserSelection.nfpsCalculation << endl;
 	cout << "Selected heuristic: " << globalUserSelection.heuristic << endl;
 	cout << "Selected problem name: " << globalUserSelection.problemName << endl;
-
-
-	//delete data from previous problem
-	globalDrawingStatus.cleanup();
-
 
 	//loadProblem
 	globalLayout.load("problems/", globalUserSelection.problemName);
@@ -37,7 +37,7 @@ void solveCB(int dummy)
 	cout << "Window Dimensions: " << globalDrawingStatus.w << " " << globalDrawingStatus.h << endl;
 	cout << "Resolution: " << globalLayout.getResolution() << endl;
 
-	//inicializar poedeira de peças
+	//inicialize piece placement
 	if (globalUserSelection.heuristic == DYNAMIC)
 		LayoutBuilder::putPieceDynamic(globalLayout, globalSolvingStatus, globalDrawingStatus, true);
 

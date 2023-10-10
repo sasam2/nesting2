@@ -1,9 +1,10 @@
 #include "SolvingStatus.h"
 
+
 SolvingStatus::SolvingStatus() {}
 
-void SolvingStatus::load(Selection& userSelection, Layout& layoutArg) {
-	this->layout = layoutArg;
+void SolvingStatus::load(Selection& userSelection, Layout& layout) {
+	//this->layout = layoutArg;
 
 	//NORMALIZAR peças e detectar largura e altura maximas
 	double maxPieceWidth = layout.getMaxWidth();
@@ -88,7 +89,7 @@ void SolvingStatus::load(Selection& userSelection, Layout& layoutArg) {
 		}
 	}
 	//Polygon_with_holes_2 stockSheetPoly = piece2PolygonWithHoles(layout.getStockSheet()[0]);
-	Polygon_with_holes_2* stockSheetsPoly = new Polygon_with_holes_2[layout.getStockSheet().size()];
+	stockSheetsPoly = new Polygon_with_holes_2[layout.getStockSheet().size()];
 
 	for (int ss = 0; ss < layout.getStockSheet().size(); ss++) {
 		stockSheetsPoly[ss] = piece2PolygonWithHoles(layout.getStockSheet()[ss]);
@@ -101,7 +102,7 @@ void SolvingStatus::load(Selection& userSelection, Layout& layoutArg) {
 
 	//decompor stock sheets
 	//inverter
-	vector<Polygon_2>* stockSheetsPolyForInnerFP = new vector<Polygon_2>[layout.getStockSheet().size()];
+	stockSheetsPolyForInnerFP = new vector<Polygon_2>[layout.getStockSheet().size()];
 	for (int ss = 0; ss < layout.getStockSheet().size(); ss++)
 	{
 		if (!(stockSheetsPoly[ss].outer_boundary()).is_simple())
@@ -380,5 +381,35 @@ vector<Polygon_2>  SolvingStatus::minkowskiSumsWithDecompositionNoConversion(vec
 
 
 SolvingStatus::~SolvingStatus() {
+
+}
+
+void SolvingStatus::cleanup() {
+
+	for (int i = 0; i < numberOfPolygons; i++) {
+		delete[] polygons[i];
+	}
+	delete[] polygons;
+	delete[] stockSheetsPoly;
+	for (int i = 0; i < numberOfPolygons; i++) {
+		delete[] polygonsDecompositions[i];		
+	}
+	delete[] polygonsDecompositions;
+	delete[] stockSheetsPolyForInnerFP;
+	
+	for (int i = 0; i < numberOfPolygons; i++)
+	{
+		for (int ri = 0; ri < nrOfRotations; ri++)
+		{
+			for (int j = 0; j < numberOfNFPs; j++)
+			{
+				delete[] nfpsPiecesAndStockSheet[i][ri][j];
+			}
+			delete[] nfpsPiecesAndStockSheet[i][ri];
+		}
+		delete[] nfpsPiecesAndStockSheet[i];
+	}
+	delete[] nfpsPiecesAndStockSheet;
+
 
 }

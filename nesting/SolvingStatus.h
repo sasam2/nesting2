@@ -10,7 +10,9 @@ class SolvingStatus
 {	
 
 private:
-	Layout layout;
+	Polygon_with_holes_2* stockSheetsPoly;
+	vector<Polygon_2>* stockSheetsPolyForInnerFP;
+
 	static Polygon_with_holes_2 piece2PolygonWithHoles(Piece a, double inv=1.0);
 	static int getNumberOfConcaveVertices(Polygon_2 p);
 	static Polygon_with_holes_2 generatePieceDiscreteRotation(Polygon_with_holes_2 p, double currentAngle);
@@ -32,7 +34,7 @@ public:
 	SolvingStatus();
 	~SolvingStatus();
 	void load(Selection& userSelection, Layout& layout);
-
+	void cleanup();
 
 };
 
