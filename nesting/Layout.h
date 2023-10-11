@@ -13,7 +13,6 @@ private:
 	vector<Piece> stockSheet;
 	int rotationStep, margin;
 	double resolution;
-	vector<GLfloat*> positions;
 	vector<int> order;
 
 	Problem loadFile(const char* baseFolder, char* filename, bool mode);
@@ -44,5 +43,7 @@ public:
 	BoundingBox stockSheetsBoundingBox();
 
 	void load(const char* folder, char* problemName);
+
+	void cleanup();
 };
 

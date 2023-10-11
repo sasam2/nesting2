@@ -299,3 +299,20 @@ void Layout::getFirstNonEmptyLine(istream* s, string* line)
 		getline(*s, *line);
 	} while (line->size() == 0 && s->good());
 }
+
+void Layout::cleanup() {
+
+	for (int i = 0; i < this->pieces.size(); i++) {
+		pieces[i].clear();
+	}
+	pieces.clear();
+	quantity.clear();
+	for (int i = 0; i < this->stockSheet.size(); i++) {
+		stockSheet[i].clear();
+	}
+	stockSheet.clear();
+	rotationStep = margin = 0;
+	resolution = 0;
+	//vector<GLfloat*> positions;
+	order.clear();
+}

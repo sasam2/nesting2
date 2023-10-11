@@ -111,3 +111,14 @@ ostream& operator<<(ostream& c, Piece p) {
 	}
 	return c;
 }
+
+void Piece::clear() {
+
+	for (int i = 0; i < this->components.size(); i++) {
+		for (int j = 0; j < this->components[i].size(); j++) {
+			delete[] this->components[i][j];
+		}	
+	}
+	this->components.clear();
+
+}

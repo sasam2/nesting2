@@ -24,4 +24,5 @@ public:
 	void print();
 	BoundingBox getBoundingBox();
 	friend ostream& operator<<(ostream& c, Piece p);
+	void clear();
 };

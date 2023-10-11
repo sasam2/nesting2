@@ -15,7 +15,7 @@ void solveCB(int dummy)
 	LayoutBuilder::cleanup();
 	globalDrawingStatus.cleanup();
 	globalSolvingStatus.cleanup();
-	//FIXME add layout cleanup here
+	globalLayout.cleanup();
 
 	//getData
 	cout << "Selected nfp algorithm: " << globalUserSelection.nfpsCalculation << endl;
