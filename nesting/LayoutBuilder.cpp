@@ -179,9 +179,10 @@ bool LayoutBuilder::displayStatic(Selection& userSelection, Layout& layout, Solv
 
 			//DEBUG guardar imagem
 #ifdef DEBUG
+			cv::Mat imgTestMat = cv::cvarrToMat(imgTest);
 			char imageName[100];
-			sprintf(imageName, "iteration %d piece %d %d piecesPlaced %d .jpg", iteration, (int)nextPiece.x(), (int)nextPiece.y(), currentDrawingNFPs.begin()->second.getPositions().size());
-			cvSaveImage(imageName, imgTest);
+			sprintf_s(imageName, "iteration %d piece %d %d piecesPlaced %d .jpg", iteration, (int)nextPiece.x(), (int)nextPiece.y(), drawingStatus.currentDrawingNFPs.begin()->second.getPositions().size());
+			cv::imwrite(imageName, imgTestMat);
 #endif
 
 			nextPlacement = getPiecePosition(imgTest, layout);
@@ -212,9 +213,9 @@ bool LayoutBuilder::displayStatic(Selection& userSelection, Layout& layout, Solv
 	drawingStatus.currentDrawingPolys.addListPlacement(nextPiece.x(), nextPiece.y(), nextPlacement, drawingStatus.blue);
 
 #ifdef DEBUG
-	cout << "Piece: " << currentDrawingPolys.getOrder().back().first << " " << currentDrawingPolys.getOrder().back().second << endl;
-	cout << "Position: " << currentDrawingPolys.getPositions().back()[0] << " " << currentDrawingPolys.getPositions().back()[1] << endl;
-	cout << "List: " << currentDrawingPolys.getLists()[currentDrawingPolys.getOrder().back().first][currentDrawingPolys.getOrder().back().second] << endl;
+	cout << "Piece: " << drawingStatus.currentDrawingPolys.getOrder().back().first << " " << drawingStatus.currentDrawingPolys.getOrder().back().second << endl;
+	cout << "Position: " << drawingStatus.currentDrawingPolys.getPositions().back()[0] << " " << drawingStatus.currentDrawingPolys.getPositions().back()[1] << endl;
+	cout << "List: " << drawingStatus.currentDrawingPolys.getLists()[drawingStatus.currentDrawingPolys.getOrder().back().first][drawingStatus.currentDrawingPolys.getOrder().back().second] << endl;
 #endif
 
 	//currentDrawingNFPs
@@ -348,7 +349,7 @@ vector<vector<cv::Point>> LayoutBuilder::showContours(cv::Mat thrImgMat)
 	cv::imshow(windowName, displayImgMat);
 
 #ifdef DEBUG
-	cvShowImage(windowName, &(IplImage)displayImgMat);
+	//cv::imwrite(windowName, displayImgMat);
 #endif
 	cntrImgMat.release();
 	invCntrImgMat.release();
@@ -438,7 +439,7 @@ bool LayoutBuilder::displayDynamic(Selection& userSelection, Layout& layout, Sol
 	{
 
 #ifdef DEBUG
-		cout << "Sizes iteration " << iteration << ": " << drawingNFPsTest.size() << " " << layoutNFPsTest.size() << endl;
+		cout << "Sizes iteration " << iteration << ": " << drawingStatus.drawingNFPsTest.size() << " " << drawingStatus.layoutNFPsTest.size() << endl;
 #endif
 
 		Point_2 polygonRotationBeingTested = itPolygonBeingTestedIndex->first;
@@ -456,9 +457,10 @@ bool LayoutBuilder::displayDynamic(Selection& userSelection, Layout& layout, Sol
 
 
 #ifdef DEBUG
+		cv::Mat imgTestMat = cv::cvarrToMat(imgTest);
 		char imageName[100];
-		sprintf(imageName, "iteration %d currentNFPs beforePositionCalc %d %d.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex);
-		cvSaveImage(imageName, imgTest);
+		sprintf_s(imageName, "iteration %d currentNFPs beforePositionCalc %d %d.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex);
+		cv::imwrite(imageName, imgTestMat);
 #endif
 
 		position = getPiecePosition(imgTest, layout);
@@ -532,10 +534,10 @@ bool LayoutBuilder::displayDynamic(Selection& userSelection, Layout& layout, Sol
 					glPopMatrix();
 
 #ifdef DEBUG
-					imgTest = getOpenCVImage(tx, ty, tw, th, GL_BLUE);
+					cv::Mat imgTestMat = getOpenCVImage(drawingStatus.tx, drawingStatus.ty, drawingStatus.tw, drawingStatus.th, GL_BLUE);
 					char imageName[100];
-					sprintf(imageName, "iteration %d currentNFPs beforePositionCalc %d %d - %d%d.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex, (int)itDrawing->first.x(), (int)itDrawing->first.y());
-					cvSaveImage(imageName, imgTest);
+					sprintf_s(imageName, "iteration %d currentNFPs beforePositionCalc %d %d - %d%d.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex, (int)itDrawing->first.x(), (int)itDrawing->first.y());
+					cv::imwrite(imageName, imgTestMat);
 					cvReleaseImage(&imgTest);
 #endif
 
@@ -567,16 +569,16 @@ bool LayoutBuilder::displayDynamic(Selection& userSelection, Layout& layout, Sol
 			glClear(GL_ACCUM_BUFFER_BIT);
 
 #ifdef DEBUG
-			IplImage* imgTest = getOpenCVImage(wWidth, wHeight, GL_BLUE);
+			cv::Mat imgTest = getOpenCVImage(drawingStatus.tx, drawingStatus.ty, drawingStatus.tw, drawingStatus.th, GL_BLUE);
 			char imageName[100];
-			sprintf(imageName, "iteration %d NFPs pieces %d %d overlaping.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex);
-			cvSaveImage(imageName, imgTest);
-			cvReleaseImage(&imgTest);
+			sprintf_s(imageName, "iteration %d NFPs pieces %d %d overlaping.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex);
+			cv::imwrite(imageName, imgTest);
+			imgTest.release();
 #endif
 
-			//desenhar a preto as peças do layout
+			//draw in black layout pieces <--- WRONG! layout and nfps images cannot be combined as they represent differrent things
 			//glClear(GL_DEPTH_BUFFER_BIT);
-			glColor3f(0.0, 0.0, 0.0);
+			/*glColor3f(0.0, 0.0, 0.0);
 			for (int i = 0; i < d->getPositions().size(); i++)
 			{
 				glPushMatrix();
@@ -586,12 +588,11 @@ bool LayoutBuilder::displayDynamic(Selection& userSelection, Layout& layout, Sol
 			}
 
 #ifdef DEBUG
-			imgTest = getOpenCVImage(tx, ty, tw, th, GL_BLUE);
-			char imageName[100];
-			sprintf(imageName, "iteration %d NFPs pieces %d %d overlaping difference.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex);
-			cvSaveImage(imageName, imgTest);
-			cvReleaseImage(&imgTest);
-#endif
+			imgTest = getOpenCVImage(drawingStatus.tx, drawingStatus.ty, drawingStatus.tw, drawingStatus.th, GL_BLUE);
+			sprintf_s(imageName, "iteration %d NFPs pieces %d %d overlaping difference.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex);
+			cv::imwrite(imageName, imgTest);
+			imgTest.release();
+#endif*/
 
 			//ler imagem da soma dos nfps com a diferença do espaço ocupado pelas peças 
 			glReadBuffer(GL_BACK_LEFT);
@@ -720,18 +721,20 @@ void LayoutBuilder::displayDynamic_drawCurrentLayout(DrawingStatus &drawingStatu
 
 		//d->bufferObject=drawingNFPsTest[Point_2(0,0)][itNFPsOfPiecesToPlaceIndex->first].bufferObject;
 #ifdef DEBUG
-		IplImage* imgTest = cvCreateImage(cvSize(tw, th), IPL_DEPTH_8U, 1);
+		IplImage* imgTest = cvCreateImage(cvSize(drawingStatus.tw, drawingStatus.th), IPL_DEPTH_8U, 1);
+		cv::Mat imgTestMat = cv::cvarrToMat(imgTest);
 		char* initPtr = imgTest->imageData;
 		glGetIntegerv(GL_PIXEL_UNPACK_BUFFER_BINDING, &previousBind);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, d->bufferObject);
 		imgTest->imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY);
 		char imageName[100];
-		sprintf(imageName, "INIT %d %d.jpg", p, r);
-		cvSaveImage(imageName, imgTest);
+		sprintf_s(imageName, "INIT %d %d.jpg", p, r);
+		cv::imwrite(imageName, imgTestMat);
 		glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, previousBind);
 		imgTest->imageData = initPtr;
 		cvReleaseImage(&imgTest);
+		imgTestMat.release();
 #endif
 	}
 }
@@ -766,7 +769,7 @@ Point_2 LayoutBuilder::putPieceDynamic(Layout& layout, SolvingStatus& solvingSta
 #ifdef DEBUG
 		cout << "Next piece: " << nextPiece.x() << " " << nextPiece.y() << endl;
 		cout << "Pieces to place:" << endl;
-		for (int i = 0; i < numberOfPolygons; i++) {
+		for (int i = 0; i < solvingStatus.numberOfPolygons; i++) {
 			cout << "Peca " << i << ": " << piecesToPlace[i] << "/" << layout.getQuantity()[i] << "; ";
 		}
 		cout << endl << endl;
@@ -911,9 +914,10 @@ Point_2 LayoutBuilder::dynamicPieceSelection(DrawingStatus drawingStatus)
 
 		cv::threshold(imgTestMat, imgTestMat, intMaxThreshold, 255, cv::THRESH_BINARY);
 #ifdef DEBUG
+
 		char imageName[100];
-		sprintf(imageName, "NFPs PBO %d %d.jpg", (int)itImg->first.x(), (int)itImg->first.y());
-		cvSaveImage(imageName, imgTest);
+		sprintf_s(imageName, "iteration %d NFPs PBO %d %d.jpg", iteration, (int)itImg->first.x(), (int)itImg->first.y());
+		cv::imwrite(imageName, imgTestMat);
 #endif
 		int wastePixels = cvCountNonZero(imgTest);
 
@@ -936,6 +940,27 @@ Point_2 LayoutBuilder::dynamicPieceSelection(DrawingStatus drawingStatus)
 	cvReleaseImage(&imgTest);
 
 	return pieceToplace;
+}
+
+cv::Mat LayoutBuilder::getOpenCVImage(int xb, int yb, int width, int height, int channel)
+{
+	IplImage* img;
+	int format;
+
+	if (channel != GL_BLUE && channel != GL_RED && channel != GL_GREEN)
+	{
+		format = GL_BGR_EXT;
+		img = cvCreateImage(cvSize(width, height), IPL_DEPTH_8U, 3);
+	}
+	else {
+		format = channel;
+		img = cvCreateImage(cvSize(width, height), IPL_DEPTH_8U, 1);
+	}
+
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadBuffer(GL_BACK_LEFT);
+	glReadPixels(xb, yb, width, height, format, GL_UNSIGNED_BYTE, img->imageData);
+	return cv::cvarrToMat(img);
 }
 
 void LayoutBuilder::cleanup() {

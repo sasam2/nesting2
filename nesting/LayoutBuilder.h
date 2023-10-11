@@ -28,6 +28,7 @@ private:
 	static Component pointVec2Component(vector<cv::Point> poly, bool rev = false);
 	static void displayDynamic_drawCurrentLayout(DrawingStatus& drawingStatus);
 	static Point_2 dynamicPieceSelection(DrawingStatus drawingStatus);
+	static cv::Mat getOpenCVImage(int xb, int yb, int width, int height, int channel=GL_BLUE);
 
 public:
 	static void buildStaticLayout(Selection& userSelection, Layout& layout, SolvingStatus& solvingStatus, DrawingStatus& drawingStatus);
