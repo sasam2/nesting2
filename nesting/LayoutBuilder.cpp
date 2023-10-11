@@ -2,6 +2,10 @@
 
 
 int LayoutBuilder::iteration=0;
+int* LayoutBuilder::placedPieces = NULL;
+GLfloat* LayoutBuilder::blue = NULL;
+GLfloat* LayoutBuilder::green = NULL;
+vector<int> LayoutBuilder::piecesToPlace;
 
 void LayoutBuilder::buildStaticLayout(Selection& userSelection, Layout& layout, SolvingStatus& solvingStatus, DrawingStatus& drawingStatus)
 {
@@ -185,10 +189,6 @@ bool LayoutBuilder::displayStatic(Selection& userSelection, Layout& layout, Solv
 			//se nao for possivel colocar essa peça terminar
 			if (nextPlacement == NULL)
 			{
-				drawingStatus.layoutNFPsTest.clear();
-				drawingStatus.currentDrawingNFPs.clear();
-				drawingStatus.drawingNFPsTest.clear();
-				drawingStatus.drawingPolysTest.clear();
 				return false;
 			}
 
@@ -255,10 +255,23 @@ GLdouble* LayoutBuilder::getPiecePosition(IplImage* layoutImg, Layout layout)
 	}
 
 	//aplicar bottom left
-	if (feasiblePositionsConverted.size() > 0)
-		return bottomLeft(feasiblePositionsConverted);
-	else
-		return NULL;
+	GLdouble* position = NULL;
+	if (feasiblePositionsConverted.size() > 0) {
+		position = bottomLeft(feasiblePositionsConverted);
+	}
+	//deleting other positions to avoid memory leaks
+	for (int i = 0; i < feasiblePositionsConverted.size(); i++)
+	{
+		for (int j = 0; j < feasiblePositionsConverted[i].size(); j++)
+		{
+			if (feasiblePositionsConverted[i][j] != position) {
+				delete[] feasiblePositionsConverted[i][j];
+			}
+		}
+	}
+	//returning bottom left position or NULL as default
+	return position;
+		
 }
 
 vector<vector<cv::Point>> LayoutBuilder::getFeasiblePositions(IplImage* image)
@@ -354,7 +367,7 @@ GLdouble* LayoutBuilder::bottomLeft(vector<vector<GLdouble*>> feasiblePositions)
 			if (feasiblePositions[i][j][0] < position[0] ||
 				feasiblePositions[i][j][0] == position[0] && feasiblePositions[i][j][1] < position[1])
 			{
-				delete position;
+				//delete position;
 				position = feasiblePositions[i][j];
 			}
 		}
@@ -726,16 +739,14 @@ void LayoutBuilder::displayDynamic_drawCurrentLayout(DrawingStatus &drawingStatu
 
 Point_2 LayoutBuilder::putPieceDynamic(Layout& layout, SolvingStatus& solvingStatus, DrawingStatus& drawingStatus, bool reset)
 {
-	static int* placedPieces;
-	static GLfloat* blue;
-	static GLfloat* green;
-	static vector<int> piecesToPlace;
 
 	if (reset)
 	{
+		delete[] blue;
 		blue = createColor(0.0, 0.0, 1.0, 1.0 / solvingStatus.numberOfPolygons);
+		delete[] green;
 		green = createColor(0.0, 1.0, 0.0, 0.1);
-		delete placedPieces;
+		delete[] placedPieces;
 		placedPieces = new int[layout.getPieces().size()];
 
 		for (int i = 0; i < layout.getPieces().size(); i++)
@@ -925,4 +936,12 @@ Point_2 LayoutBuilder::dynamicPieceSelection(DrawingStatus drawingStatus)
 	cvReleaseImage(&imgTest);
 
 	return pieceToplace;
+}
+
+void LayoutBuilder::cleanup() {
+	
+	iteration = 0;
+	delete[] blue;
+	delete[] green;
+	delete[] placedPieces;
 }

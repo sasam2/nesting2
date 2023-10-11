@@ -12,10 +12,10 @@ ofstream testfile;
 void solveCB(int dummy)
 {
 	//delete data from previous problem
+	LayoutBuilder::cleanup();
 	globalDrawingStatus.cleanup();
 	globalSolvingStatus.cleanup();
 	//FIXME add layout cleanup here
-	LayoutBuilder::iteration = 0;
 
 	//getData
 	cout << "Selected nfp algorithm: " << globalUserSelection.nfpsCalculation << endl;

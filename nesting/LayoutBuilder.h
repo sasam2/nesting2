@@ -10,6 +10,14 @@ using namespace std;
 class LayoutBuilder
 {
 private:
+	static int iteration;
+
+	static int* placedPieces;
+	static GLfloat* blue;
+	static GLfloat* green;
+	static vector<int> piecesToPlace;
+
+
 	static GLdouble* getPiecePosition(IplImage* layoutImg, Layout layout);
 	static vector<vector<cv::Point>> getFeasiblePositions(IplImage* image);
 	static vector<vector<cv::Point>> showContours(cv::Mat thrImgMat);
@@ -22,12 +30,11 @@ private:
 	static Point_2 dynamicPieceSelection(DrawingStatus drawingStatus);
 
 public:
-
-	static int iteration;
 	static void buildStaticLayout(Selection& userSelection, Layout& layout, SolvingStatus& solvingStatus, DrawingStatus& drawingStatus);
 	static bool displayStatic(Selection& userSelection, Layout& layout, SolvingStatus& solvingStatus, DrawingStatus& drawingStatus, ofstream* myfile);
 	static bool displayDynamic(Selection& userSelection, Layout& layout, SolvingStatus& solvingStatus, DrawingStatus& drawingStatus, ofstream* myfile);
 	static Point_2 putPieceDynamic(Layout& layout, SolvingStatus& solvingStatus, DrawingStatus& drawingStatus, bool reset);
 	static void buildDynamicLayout(Selection& userSelection, Layout& layout, SolvingStatus& solvingStatus, DrawingStatus& drawingStatus);
+	static void cleanup();
 };
 
