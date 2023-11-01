@@ -1,4 +1,5 @@
 #pragma once
+//#define DEBUG
 #include <GL/glew.h>
 #include <GL/glui.h>
 #include <opencv2/core/core_c.h>
@@ -18,8 +19,8 @@ private:
 	static vector<int> piecesToPlace;
 
 
-	static GLdouble* getPiecePosition(IplImage* layoutImg, Layout layout);
-	static vector<vector<cv::Point>> getFeasiblePositions(IplImage* image);
+	static GLdouble* getPiecePosition(cv::Mat layoutImg, Layout layout);
+	static vector<vector<cv::Point>> getFeasiblePositions(cv::Mat image);
 	static vector<vector<cv::Point>> showContours(cv::Mat thrImgMat);
 	static cv::Point bottomLeft(vector<vector<cv::Point>> feasiblePositions);
 	static pair<vector<vector<cv::Point>>, vector<cv::Vec4i>> getContours(cv::Mat mat, double maxDist);

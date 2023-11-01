@@ -174,15 +174,14 @@ bool LayoutBuilder::displayStatic(Selection& userSelection, Layout& layout, Solv
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, d->bufferObject);
 
 			//determinar a posicao da peça
-			IplImage* imgTest = cvCreateImage(cvSize(drawingStatus.tw, drawingStatus.th), IPL_DEPTH_8U, 1);
-			imgTest->imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY);
+			char *imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY);
+			cv::Mat imgTest(drawingStatus.th, drawingStatus.tw, CV_8UC1, imageData);
 
 			//DEBUG guardar imagem
 #ifdef DEBUG
-			cv::Mat imgTestMat = cv::cvarrToMat(imgTest);
 			char imageName[100];
 			sprintf_s(imageName, "iteration %d piece %d %d piecesPlaced %d .jpg", iteration, (int)nextPiece.x(), (int)nextPiece.y(), drawingStatus.currentDrawingNFPs.begin()->second.getPositions().size());
-			cv::imwrite(imageName, imgTestMat);
+			cv::imwrite(imageName, imgTest);
 #endif
 
 			nextPlacement = getPiecePosition(imgTest, layout);
@@ -195,7 +194,7 @@ bool LayoutBuilder::displayStatic(Selection& userSelection, Layout& layout, Solv
 
 			glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, previousBind);
-			cvReleaseImage(&imgTest);
+			imgTest.release();
 		}
 	}
 
@@ -239,7 +238,7 @@ bool LayoutBuilder::displayStatic(Selection& userSelection, Layout& layout, Solv
 	return true;
 }
 
-GLdouble* LayoutBuilder::getPiecePosition(IplImage* layoutImg, Layout layout)
+GLdouble* LayoutBuilder::getPiecePosition(cv::Mat layoutImg, Layout layout)
 {
 	vector<vector<cv::Point>> feasiblePositions = getFeasiblePositions(layoutImg);
 	vector<vector<GLdouble*>> feasiblePositionsConverted(feasiblePositions.size());
@@ -275,10 +274,9 @@ GLdouble* LayoutBuilder::getPiecePosition(IplImage* layoutImg, Layout layout)
 		
 }
 
-vector<vector<cv::Point>> LayoutBuilder::getFeasiblePositions(IplImage* image)
+vector<vector<cv::Point>> LayoutBuilder::getFeasiblePositions(cv::Mat image)
 {
-	cv::Mat imageMat = cv::cvarrToMat(image);
-	return showContours(imageMat);
+	return showContours(image);
 }
 
 
@@ -449,25 +447,23 @@ bool LayoutBuilder::displayDynamic(Selection& userSelection, Layout& layout, Sol
 		//determinar a posiçao da peça a experimentar
 		clock_t lala = clock();
 		GLdouble* position;
-		IplImage* imgTest = cvCreateImage(cvSize(drawingStatus.tw, drawingStatus.th), IPL_DEPTH_8U, 1);
-		char* initPtr = imgTest->imageData;
+		
 		glGetIntegerv(GL_PIXEL_UNPACK_BUFFER_BINDING, &previousBind);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, drawingStatus.currentDrawingNFPs[polygonRotationBeingTested].bufferObject);
-		imgTest->imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY);
-
+		char *imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY);
+		cv::Mat imgTest(drawingStatus.th, drawingStatus.tw, CV_8UC1, imageData);
 
 #ifdef DEBUG
-		cv::Mat imgTestMat = cv::cvarrToMat(imgTest);
+		
 		char imageName[100];
 		sprintf_s(imageName, "iteration %d currentNFPs beforePositionCalc %d %d.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex);
-		cv::imwrite(imageName, imgTestMat);
+		cv::imwrite(imageName, imgTest);
 #endif
 
 		position = getPiecePosition(imgTest, layout);
 		glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, previousBind);
-		imgTest->imageData = initPtr;
-		cvReleaseImage(&imgTest);
+		imgTest.release();
 
 		clock_t lalala = clock();
 		findPositioningTime += diffclock(lalala, lala);
@@ -538,7 +534,7 @@ bool LayoutBuilder::displayDynamic(Selection& userSelection, Layout& layout, Sol
 					char imageName[100];
 					sprintf_s(imageName, "iteration %d currentNFPs beforePositionCalc %d %d - %d%d.jpg", iteration, polygonBeingTestedPiecesIndex, rotationBeingTestedPiecesIndex, (int)itDrawing->first.x(), (int)itDrawing->first.y());
 					cv::imwrite(imageName, imgTestMat);
-					cvReleaseImage(&imgTest);
+					imgTestMat.release();
 #endif
 
 					//renderizar nfps do poligono
@@ -721,20 +717,16 @@ void LayoutBuilder::displayDynamic_drawCurrentLayout(DrawingStatus &drawingStatu
 
 		//d->bufferObject=drawingNFPsTest[Point_2(0,0)][itNFPsOfPiecesToPlaceIndex->first].bufferObject;
 #ifdef DEBUG
-		IplImage* imgTest = cvCreateImage(cvSize(drawingStatus.tw, drawingStatus.th), IPL_DEPTH_8U, 1);
-		cv::Mat imgTestMat = cv::cvarrToMat(imgTest);
-		char* initPtr = imgTest->imageData;
 		glGetIntegerv(GL_PIXEL_UNPACK_BUFFER_BINDING, &previousBind);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, d->bufferObject);
-		imgTest->imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY);
+		char *imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY);
+		cv::Mat imgTest(drawingStatus.th, drawingStatus.tw, CV_8SC1, imageData);
 		char imageName[100];
 		sprintf_s(imageName, "INIT %d %d.jpg", p, r);
-		cv::imwrite(imageName, imgTestMat);
+		cv::imwrite(imageName, imgTest);
 		glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, previousBind);
-		imgTest->imageData = initPtr;
-		cvReleaseImage(&imgTest);
-		imgTestMat.release();
+		imgTest.release();
 #endif
 	}
 }
@@ -892,8 +884,6 @@ Point_2 LayoutBuilder::dynamicPieceSelection(DrawingStatus drawingStatus)
 	Point_2 pieceToplace(-1, -1);
 	int previousWastePixels = numeric_limits<int>::max();
 
-	IplImage* imgTest = cvCreateImage(cvSize(drawingStatus.tw, drawingStatus.th), IPL_DEPTH_8U, 1);
-	void* initPtr = imgTest->imageData;
 	double intMinThreshold, intMaxThreshold;
 	for (map<Point_2, GLuint>::iterator itImg = drawingStatus.layoutNFPsTest.begin();
 		itImg != drawingStatus.layoutNFPsTest.end();
@@ -905,21 +895,22 @@ Point_2 LayoutBuilder::dynamicPieceSelection(DrawingStatus drawingStatus)
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, itImg->second);
 
 		//cout<<"PBO: "<<(int)itImg->second<<endl;
-		imgTest->imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_WRITE);
+		char *imageData = (char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_WRITE);
+		cv::Mat imgTest(drawingStatus.th, drawingStatus.tw, CV_8UC1, imageData);
 		//cout<<"ptr: "<<(int)imgTest->imageData<<endl;
-		cvMinMaxLoc(imgTest, &intMinThreshold, &intMaxThreshold);
+		cv::minMaxLoc(imgTest, &intMinThreshold, &intMaxThreshold);
 		intMaxThreshold--;
-
-		cv::Mat imgTestMat = cv::cvarrToMat(imgTest);
-
-		cv::threshold(imgTestMat, imgTestMat, intMaxThreshold, 255, cv::THRESH_BINARY);
+		cv::Mat outputImgTest = cv::Mat::zeros(drawingStatus.th, drawingStatus.tw, CV_8UC1);
+		cv::threshold(imgTest, outputImgTest, intMaxThreshold, 255, cv::THRESH_BINARY);
 #ifdef DEBUG
 
 		char imageName[100];
 		sprintf_s(imageName, "iteration %d NFPs PBO %d %d.jpg", iteration, (int)itImg->first.x(), (int)itImg->first.y());
-		cv::imwrite(imageName, imgTestMat);
+		cv::imwrite(imageName, outputImgTest);
 #endif
-		int wastePixels = cvCountNonZero(imgTest);
+		int wastePixels = cv::countNonZero(outputImgTest);
+		outputImgTest.release();
+		imgTest.release();
 
 		if (wastePixels < previousWastePixels) {
 #ifdef DEBUG
@@ -936,31 +927,29 @@ Point_2 LayoutBuilder::dynamicPieceSelection(DrawingStatus drawingStatus)
 		double intMaxThreshold, intMinThreshold;
 
 	}
-	imgTest->imageData = (char*)initPtr;
-	cvReleaseImage(&imgTest);
 
 	return pieceToplace;
 }
 
 cv::Mat LayoutBuilder::getOpenCVImage(int xb, int yb, int width, int height, int channel)
 {
-	IplImage* img;
+	cv::Mat img;
 	int format;
 
 	if (channel != GL_BLUE && channel != GL_RED && channel != GL_GREEN)
 	{
 		format = GL_BGR_EXT;
-		img = cvCreateImage(cvSize(width, height), IPL_DEPTH_8U, 3);
+		img = cv::Mat::zeros(height, width, CV_8UC3);
 	}
 	else {
 		format = channel;
-		img = cvCreateImage(cvSize(width, height), IPL_DEPTH_8U, 1);
+		img = cv::Mat::zeros(height, width, CV_8UC1);
 	}
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glReadBuffer(GL_BACK_LEFT);
-	glReadPixels(xb, yb, width, height, format, GL_UNSIGNED_BYTE, img->imageData);
-	return cv::cvarrToMat(img);
+	glReadPixels(xb, yb, width, height, format, GL_UNSIGNED_BYTE, img.ptr());
+	return img;
 }
 
 void LayoutBuilder::cleanup() {
